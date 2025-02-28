@@ -1,0 +1,3 @@
+.MainPage {
+	@apply flex flex-col h-full w-full bg-[#2F2F2F];
+}
