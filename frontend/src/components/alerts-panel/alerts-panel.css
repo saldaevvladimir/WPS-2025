@@ -1,3 +1,4 @@
 .AlertsPanel {
-	
+	@apply w-[1760px] h-[225px] border-[3px] border-[#d7d7d7] bg-[var(--elements-bg-color)] p-[16px] text-[20px] text-[#ff0000] leading-[2] overflow-y-scroll;
+	box-shadow: 1px 130px 52px 20px #87878740 inset;
 }

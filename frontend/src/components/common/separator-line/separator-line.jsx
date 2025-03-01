@@ -1,9 +1,9 @@
 import './separator-line.css'
 
-function SeparatorLine() {
+function SeparatorLine({ vertical = false, className = '' }) {
 
 	return (
-		<div className='SeparatorLine'>
+		<div className={`${vertical ? 'border-l' : 'border-t'} ${className}`}>
 
 		</div>
 	)

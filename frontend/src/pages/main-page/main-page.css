@@ -1,3 +1,15 @@
 .MainPage {
-	@apply flex flex-col h-full w-full bg-[#2F2F2F];
+	@apply flex flex-col h-full w-full bg-[#2F2F2F] pl-[80px] pr-[80px] pt-[80px];
+}
+
+.HBox {
+	@apply flex;
+}
+
+.VBox {
+	@apply flex flex-col;
+}
+
+.Separator {
+	@apply border-[#fff] border-[1px];
 }

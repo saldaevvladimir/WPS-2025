@@ -5,9 +5,9 @@ function Logo() {
 
 	return (
 		<div className='Logo'>
-			<img 
-				src={LogoSVG} 
-				alt='AetherLogo' 
+			<img
+				src={LogoSVG}
+				alt='AetherLogo'
 				className='LogoImage'
 			/>
 		</div>

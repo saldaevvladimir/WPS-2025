@@ -1,5 +1,5 @@
 .Logo {
-	@apply w-[880px] h-[280px] bg-none flex items-center justify-center;
+	@apply w-[880px] h-[280px] bg-none flex items-center justify-center border-[1px];
 }
 
 .LogoImage {
