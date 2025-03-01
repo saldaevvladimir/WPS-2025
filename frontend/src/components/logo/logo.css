@@ -1,0 +1,7 @@
+.Logo {
+	@apply w-[880px] h-[280px] bg-none flex items-center justify-center;
+}
+
+.LogoImage {
+	@apply w-[744px] h-[372px] m-[-16rem];
+}
