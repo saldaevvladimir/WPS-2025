@@ -22,5 +22,4 @@ def post_data(request):
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-	InfoConsumer().send_message_with_state_to_group(state, laboratory_id=data['laboratory_id'])
 	return Response(status=status.HTTP_201_CREATED)
