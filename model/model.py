@@ -23,14 +23,14 @@ class FishDetectionModel():
 
       add_bounding_box(image, predictions)
         Adding Bounding Boxes to an Image.
-
     '''
 
     def __init__(self, model_path: str,
                  rtsp_url: str | None = None):
-        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
          
         self.model = YOLO(model_path)
+        self.rtsp_url = rtsp_url
         self.cap = cv2.VideoCapture(rtsp_url)
 
     def predict(self, input_data: np.ndarray) -> list:
@@ -41,33 +41,41 @@ class FishDetectionModel():
           input_data (np.ndarray): frame for which predictions need to be obtained.
         '''
 
-        return self.model(input_data) 
+        return self.model(input_data, verbose=False) 
 
-    def rtsp_predict(self) -> tuple[str, int]:
+    def rtsp_predict(self, max_retries=3) -> tuple[str, int]:
         '''Returns the current frame predictions of the stream and the population size.'''
 
-        if not self.cap.isOpened():
-            print("Failed to read rtsp stream. Make sure you specified it correctly `rtshp_url`.")
-            return None
+        retries = 0
+        while retries < max_retries:
+            if not self.cap.isOpened():
+                print("Failed to read RTSP stream. Retrying...")
+                self.cap = cv2.VideoCapture(self.rtsp_url)
+                retries += 1
+                continue
 
-        ret, frame = self.cap.read()
+            ret, frame = self.cap.read()
 
-        if not ret:
-            print("Failed to get frame. Terminating")
-            return None
-        
-        predict = self.predict(frame)[0].boxes.xywh
-        frame_with_boxes = self.add_bounding_box(frame, predict)
+            if ret:
+                predict = self.predict(frame)[0].boxes.xywh
+                frame_with_boxes = self.add_bounding_box(frame, predict)
 
-        _, buffer = cv2.imencode('.jpg', frame_with_boxes)
-        jpeg_bytes = buffer.tobytes()
-        jpeg_base64 = base64.b64encode(jpeg_bytes).decode('utf-8')
+                _, buffer = cv2.imencode('.jpg', frame_with_boxes)
+                jpeg_bytes = buffer.tobytes()
+                jpeg_base64 = base64.b64encode(jpeg_bytes).decode('utf-8')
 
-        return jpeg_base64, len(predict)
+                return jpeg_base64, len(predict)
+
+            print("Failed to get frame. Retrying...")
+            retries += 1
+
+        print("Max retries reached. Terminating.")
+        return None
 
     def set_rtsp_stream(self, new_rtsp_url: str) -> None:
         '''Change of rtsp stream'''
 
+        self.rtsp_url = new_rtsp_url
         self.cap = cv2.VideoCapture(new_rtsp_url)
         return None
 
@@ -104,7 +112,7 @@ class FishDetectionModel():
 
 
 if __name__ == "__main__":
-    rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037"
+    rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037/Streaming/Channels/101?tcp"
     model = FishDetectionModel("weights/best.pt", rtsp_url)
     result = model.rtsp_predict()
 
@@ -118,9 +126,8 @@ if __name__ == "__main__":
         else:
             image = frame_with_boxes
 
-        cv2.imshow(image)
+        cv2.imshow('Fish Detection', image)
         print(f"Population size: {population_size}")
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    
