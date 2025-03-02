@@ -3,11 +3,11 @@
 }
 
 .HBox {
-	@apply flex;
+	@apply flex w-full;
 }
 
 .VBox {
-	@apply flex flex-col;
+	@apply flex flex-col flex-grow;
 }
 
 .Separator {

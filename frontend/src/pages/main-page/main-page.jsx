@@ -11,6 +11,7 @@ function MainPage() {
 	const [stats, setStats] = useState([])
 	const alertsPanelRef = useRef(null)
 
+	const videoSrc = 'videoSrc.m3u8'
 	const statsUrl = 'api/stats'
 	const alertsUrl = 'api/alerts'
 
@@ -43,7 +44,7 @@ function MainPage() {
 	return (
 		<div className='MainPage'>
 			<div className='HBox'>
-				<VideoPlayer />
+				<VideoPlayer videoSrc={videoSrc} />
 				<SeparatorLine
 					vertical={true}
 					className='Separator ml-[40px] mr-[40px]'
