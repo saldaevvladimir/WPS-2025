@@ -8,6 +8,9 @@ from .serializers import setStateSerializer
 
 
 class InfoConsumer(WebsocketConsumer):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
 	def connect(self):
 		self.laboratory_id = self.scope['url_route']['kwargs']['laboratory_id']
 
@@ -36,7 +39,7 @@ class InfoConsumer(WebsocketConsumer):
 		if laboratory_id == -1:
 			laboratory_id = self.laboratory_id
 
-		self.room_group_name = f'laboratory_{self.laboratory_id}'
+		self.room_group_name = f'laboratory_{laboratory_id}'
 		async_to_sync(self.channel_layer.group_send)(
 			self.room_group_name, {
 				'type': 'send_data',
