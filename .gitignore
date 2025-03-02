@@ -7,8 +7,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# venv
+venv/
+
 # Model
 frames/
+project/
+data/
+data.zip
 
 node_modules
 dist
