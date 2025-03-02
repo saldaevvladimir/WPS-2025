@@ -3,13 +3,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --elements-bg-color: #4a4a4a;
 }
 
 .App {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  background-color:blanchedalmond;
+  @apply flex flex-col h-full w-full;
+
+  font-family: Inter;
+  font-weight: 900;
+  letter-spacing: 0%;
+  color: white;
 }
 
