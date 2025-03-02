@@ -6,8 +6,6 @@ from rest_framework.response import Response
 
 from .models import *
 
-from .consumers import InfoConsumer
-
 
 @api_view(['POST'])
 def post_data(request):
@@ -16,6 +14,7 @@ def post_data(request):
 	try:
 		data = json.loads(request.data)
 		state = State.objects.create(
+			laboratory_id = data['laboratory_id'],
 			state1=data['state1'],
 			state2=data['state2'],
 		)

@@ -24,7 +24,12 @@ class InfoConsumer(WebsocketConsumer):
 		self.accept()
 
 	def receive(self, text_data=None, bytes_data=None):
-		state = State.objects.order_by('-id')[0]
+		data = json.loads(text_data)
+		state = State.objects.create(
+			laboratory_id=data.get('laboratory_id', self.laboratory_id),
+			state1=data['state1'],
+			state2=data['state2'],
+		)
 
 		self.send_message_with_state_to_group(state)
 
