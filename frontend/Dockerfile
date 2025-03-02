@@ -8,7 +8,8 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 5173
+RUN npm run build
 
-CMD ["npm", "run", "dev"]
-# поменять на npm run preview потом
+EXPOSE 4173
+
+CMD ["npm", "run", "preview"]
