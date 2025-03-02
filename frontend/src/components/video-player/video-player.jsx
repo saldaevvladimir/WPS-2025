@@ -35,7 +35,7 @@ function VideoPlayer({ videoSrc }) {
 	}, [videoSrc])
 
 	return (
-		<div className='RtspPlayer'>
+		<div className='VideoPlayer'>
 			<video
 				ref={videoRef}
 				autoPlay
