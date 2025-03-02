@@ -105,7 +105,7 @@ class FishDetectionModel():
 
 if __name__ == "__main__":
     rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037"
-    model = FishDetectionModel("best.pt", rtsp_url)
+    model = FishDetectionModel("weights/best.pt", rtsp_url)
     result = model.rtsp_predict()
 
     if result is not None:
