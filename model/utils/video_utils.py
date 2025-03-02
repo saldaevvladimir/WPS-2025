@@ -194,10 +194,10 @@ def write_rtsp_stream(rtsp_url: str,
 
 if __name__ == "__main__":
     # test functions  
-    save_annotated_frames("./test_data/output1.avi", 
-                           "./test_data/instances_default.json",
-                           save_dir_path="frames")
+    # save_annotated_frames("./test_data/output1.avi", 
+    #                         "./test_data/output1.json",
+    #                         save_dir_path="frames")
     
-    draw_annotation_frame("./frames/frame_000081.png", 
-                          "./test_data/instances_default.json")
+    draw_annotation_frame("./frames/frame_000107.png", 
+                          "./test_data/output1.json")
     
