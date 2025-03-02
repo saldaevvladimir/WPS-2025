@@ -25,4 +25,4 @@ npm install
 npm run dev
 ```
 
-### 4. Перейдите по ссылке вида localhost:<port>
+### 4. Перейдите по ссылке вида localhost:"port"
