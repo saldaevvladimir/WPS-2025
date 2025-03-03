@@ -1,3 +1,4 @@
+import base64
 import json
 
 from rest_framework import status
@@ -17,8 +18,8 @@ def post_data(request):
 	try:
 		data = json.loads(request.body)
 		state = State.objects.create(
-			state1=data['state1'],
-			state2=data['state2'],
+			frame_with_boxes=base64.b64decode(data['frame_with_boxes']),
+			population_size=data['population_size'],
 		)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

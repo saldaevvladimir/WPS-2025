@@ -139,15 +139,9 @@ if __name__ == "__main__":
         if result is not None:
             frame_with_boxes, population_size = result
 
-            if isinstance(frame_with_boxes, str):
-                jpeg_bytes = base64.b64decode(frame_with_boxes)
-                jpeg_array = np.frombuffer(jpeg_bytes, dtype=np.uint8)
-                image = cv2.imdecode(jpeg_array, cv2.IMREAD_COLOR)
-            else:
-                image = frame_with_boxes
+            ans = requests.post(url, json.dumps({
+                "frame_with_boxes": frame_with_boxes,
+                "population_size": population_size,
+            }))
 
-        cv2.imshow('Fish Detection', image)
-        print(f"Population size: {population_size}")
-
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+            print(ans.text)

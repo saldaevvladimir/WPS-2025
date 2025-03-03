@@ -6,11 +6,6 @@ from channels.layers import get_channel_layer
 
 from .models import *
 
-
-
-from .serializers import setStateSerializer
-
-
 class InfoConsumer(WebsocketConsumer):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -28,8 +23,8 @@ class InfoConsumer(WebsocketConsumer):
 	def receive(self, text_data=None, bytes_data=None):
 		data = json.loads(text_data)
 		state = State.objects.create(
-			state1=data['state1'],
-			state2=data['state2'],
+			population_size=data['population_size'],
+			frame_with_boxes=data['frame_with_boxes'],
 		)
 
 		self.send_message_with_state_to_group(state, self.channel_layer)
