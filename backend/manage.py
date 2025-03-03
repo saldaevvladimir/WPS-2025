@@ -2,11 +2,13 @@
 import os
 import sys
 import json
+import time
 import requests
 import threading
 
 sys.path.append('..')
 from model.model import FishDetectionModel
+from scipy.stats import mode
 
 
 def main():
@@ -31,14 +33,19 @@ def start_model():
     url = "http://127.0.0.1:8000/api/post_data/"
 
     model = FishDetectionModel("../model/weights/best.pt", rtsp_url)
+    population_10 = []
     while True:
         result = model.rtsp_predict()
         if result is not None:
             frame_with_boxes, population_size = result
+            population_10.append(population_size)
+
+            if len(population_10) > 10:
+                population_10.pop(0)
 
             requests.post(url, json.dumps({
                 "frame_with_boxes": frame_with_boxes,
-                "population_size": population_size,
+                "population_size": str(mode(population_10).mode),
             }))
 
 
