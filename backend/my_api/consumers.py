@@ -2,7 +2,11 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from channels.layers import get_channel_layer
+
 from .models import *
+
+
 
 from .serializers import setStateSerializer
 
@@ -12,9 +16,7 @@ class InfoConsumer(WebsocketConsumer):
 		super().__init__(*args, **kwargs)
 
 	def connect(self):
-		self.laboratory_id = self.scope['url_route']['kwargs']['laboratory_id']
-
-		self.room_group_name = f'laboratory_{self.laboratory_id}'
+		self.room_group_name = f'laboratory'
 
 		async_to_sync(self.channel_layer.group_add)(
 			self.room_group_name,
@@ -26,26 +28,22 @@ class InfoConsumer(WebsocketConsumer):
 	def receive(self, text_data=None, bytes_data=None):
 		data = json.loads(text_data)
 		state = State.objects.create(
-			laboratory_id=data.get('laboratory_id', self.laboratory_id),
 			state1=data['state1'],
 			state2=data['state2'],
 		)
 
-		self.send_message_with_state_to_group(state)
+		self.send_message_with_state_to_group(state, self.channel_layer)
 
 	def send_data(self, event):
 		state = event['state']
 
 		self.send(text_data=json.dumps({
-			'state': state
+			'state': state.return_self()
 		}))
 
-	def send_message_with_state_to_group(self, state, laboratory_id=-1):
-		if laboratory_id == -1:
-			laboratory_id = self.laboratory_id
-
-		self.room_group_name = f'laboratory_{laboratory_id}'
-		async_to_sync(self.channel_layer.group_send)(
+	def send_message_with_state_to_group(self, state, layer=get_channel_layer()):
+		self.room_group_name = f'laboratory'
+		async_to_sync(layer.group_send)(
 			self.room_group_name, {
 				'type': 'send_data',
 				'state': state

@@ -1,5 +1,8 @@
 import base64
+import json
 import os
+
+import requests
 import torch
 import cv2
 import numpy as np
@@ -112,19 +115,36 @@ class FishDetectionModel():
 
 
 if __name__ == "__main__":
-    rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037/Streaming/Channels/101?tcp"
+    # url = "http://127.0.0.1:8000/api/post_data/"
+    #
+    # ans = requests.post(url, json.dumps({
+    #     "state1": "qwe",
+    #     "state2": False,
+    # }))
+    #
+    # print(ans.text)
+
+    url = "http://127.0.0.1:8000/api/post_data/"
+
+    ans = requests.post(url, json.dumps({
+        "state1": "qwe",
+        "state2": False,
+    }))
+    rtsp_url = './utils/test_data/output1.avi'
+    # rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037/Streaming/Channels/101?tcp"
     model = FishDetectionModel("weights/best.pt", rtsp_url)
-    result = model.rtsp_predict()
+    while True:
+        result = model.rtsp_predict()
 
-    if result is not None:
-        frame_with_boxes, population_size = result
+        if result is not None:
+            frame_with_boxes, population_size = result
 
-        if isinstance(frame_with_boxes, str):
-            jpeg_bytes = base64.b64decode(frame_with_boxes)
-            jpeg_array = np.frombuffer(jpeg_bytes, dtype=np.uint8)
-            image = cv2.imdecode(jpeg_array, cv2.IMREAD_COLOR)
-        else:
-            image = frame_with_boxes
+            if isinstance(frame_with_boxes, str):
+                jpeg_bytes = base64.b64decode(frame_with_boxes)
+                jpeg_array = np.frombuffer(jpeg_bytes, dtype=np.uint8)
+                image = cv2.imdecode(jpeg_array, cv2.IMREAD_COLOR)
+            else:
+                image = frame_with_boxes
 
         cv2.imshow('Fish Detection', image)
         print(f"Population size: {population_size}")
