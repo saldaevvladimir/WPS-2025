@@ -36,6 +36,9 @@ class FishDetectionModel():
         self.cap = None
         self._init_capture()
 
+        self.__frame_count = 0
+        self.__frame_skip_count = 10
+
     def _init_capture(self):
         os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
 
@@ -69,7 +72,14 @@ class FishDetectionModel():
 
             ret, frame = self.cap.read()
 
+
             if ret:
+                self.__frame_count += 1
+
+                if self.__frame_count < self.__frame_skip_count:
+                    print("skipping frame")
+                    return None, None
+                self.__frame_count = 0
                 predict = self.predict(frame)[0].boxes.xywh
                 frame_with_boxes = self.add_bounding_box(frame, predict)
 
@@ -133,6 +143,7 @@ if __name__ == "__main__":
     # rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037/Streaming/Channels/101?tcp"
     rtsp_url = './utils/test_data/output1.avi'
     model = FishDetectionModel("weights/best.pt", rtsp_url)
+
     while True:
         result = model.rtsp_predict()
         if result is not None:
@@ -142,4 +153,4 @@ if __name__ == "__main__":
                 "frame_with_boxes": frame_with_boxes,
                 "population_size": population_size,
             }))
-        time.sleep(1)
+
