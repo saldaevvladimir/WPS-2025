@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import time
 
 import requests
 import torch
@@ -115,15 +116,6 @@ class FishDetectionModel():
 
 
 if __name__ == "__main__":
-    # url = "http://127.0.0.1:8000/api/post_data/"
-    #
-    # ans = requests.post(url, json.dumps({
-    #     "state1": "qwe",
-    #     "state2": False,
-    # }))
-    #
-    # print(ans.text)
-
     url = "http://127.0.0.1:8000/api/post_data/"
 
     ans = requests.post(url, json.dumps({
@@ -145,3 +137,5 @@ if __name__ == "__main__":
             }))
 
             print(ans.text)
+
+        time.sleep(1)
