@@ -1,10 +1,11 @@
 import base64
 import os
-import torch
-import cv2
-import numpy as np
+import torch # type: ignore
+import cv2 # type: ignore
+import numpy as np # type: ignore
 
-from ultralytics import YOLO
+from ultralytics import YOLO # type: ignore
+
 
 
 class FishDetectionModel():
@@ -27,12 +28,21 @@ class FishDetectionModel():
 
     def __init__(self, model_path: str,
                  rtsp_url: str | None = None):
-        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
-         
-        self.model = YOLO(model_path)
+        self.model = YOLO(model_path, verbose=False)
         self.rtsp_url = rtsp_url
-        self.cap = cv2.VideoCapture(rtsp_url)
+        self.cap = None
+        self._init_capture()
 
+    def _init_capture(self):
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
+
+        if self.rtsp_url:
+            self.cap = cv2.VideoCapture(self.rtsp_url, cv2.CAP_FFMPEG)
+            self.cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 5000)
+            
+            if not self.cap.isOpened():
+                print(f"Ошибка: Не удалось открыть поток {self.rtsp_url}")
+                
     def predict(self, input_data: np.ndarray) -> list:
         '''
         Returns predictions in YOLO format.
@@ -71,13 +81,14 @@ class FishDetectionModel():
 
         print("Max retries reached. Terminating.")
         return None
-
+    
     def set_rtsp_stream(self, new_rtsp_url: str) -> None:
         '''Change of rtsp stream'''
-
+        
+        if self.cap and self.cap.isOpened():
+            self.cap.release()
         self.rtsp_url = new_rtsp_url
-        self.cap = cv2.VideoCapture(new_rtsp_url)
-        return None
+        self._init_capture()
 
     @classmethod
     def add_bounding_box(cls, image: np.ndarray, 
@@ -112,7 +123,10 @@ class FishDetectionModel():
 
 
 if __name__ == "__main__":
-    rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037/Streaming/Channels/101?tcp"
+    # rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037/stream"
+    # Тест на видеоряде
+    rtsp_url = "./utils/test_data/output1.avi"
+    
     model = FishDetectionModel("weights/best.pt", rtsp_url)
     result = model.rtsp_predict()
 
@@ -131,3 +145,4 @@ if __name__ == "__main__":
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+        
