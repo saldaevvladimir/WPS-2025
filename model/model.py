@@ -27,25 +27,11 @@ class FishDetectionModel():
     """
 
     def __init__(self, model_path: str,
-                rtsp_url: str | None = None,
-                frame_skip_count: int = 24):
+                rtsp_url: str | None = None):
         self.model = YOLO(model_path, verbose=False)
         self.rtsp_url = rtsp_url
         self.cap = None
         self._init_capture()
-
-        self.__frame_count = 0
-        self.__frame_skip_count = frame_skip_count
-
-    def _init_capture(self):
-        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
-
-        if self.rtsp_url:
-            self.cap = cv2.VideoCapture(self.rtsp_url, cv2.CAP_FFMPEG)
-            self.cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 5000)
-
-            if not self.cap.isOpened():
-                print(f"Ошибка: Не удалось открыть поток {self.rtsp_url}")
 
     def _init_capture(self):
         os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
@@ -72,17 +58,10 @@ class FishDetectionModel():
 
         if not self.cap.isOpened():
             print("Failed to read RTSP stream. Retrying...")
-            self.cap = cv2.VideoCapture(self.rtsp_url)
+            return None
 
         ret, frame = self.cap.read()
         if ret:
-            self.__frame_count += 1
-
-            if self.__frame_count < self.__frame_skip_count:
-                return None
-
-            self.__frame_count = 0
-
             predict = self.predict(frame)[0].boxes.xywh
             frame_with_boxes = self.add_bounding_box(frame, predict)
 
@@ -139,8 +118,10 @@ class FishDetectionModel():
 
 
 if __name__ == "__main__":
-    rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037"
-    model = FishDetectionModel("best.pt", rtsp_url)
+    #rtsp_url = "rtsp://pool250:_250_pool@45.152.168.61:52037"
+    rtsp_url = "./utils/test_data/output1.avi"
+    
+    model = FishDetectionModel("weights/best.pt", rtsp_url)
     result = model.rtsp_predict()
 
     if result is not None:
@@ -153,8 +134,10 @@ if __name__ == "__main__":
         else:
             image = frame_with_boxes
 
-        cv2.imshow(image)
+        cv2.imshow("Fish", image)
         print(f"Population size: {population_size}")
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+    else:
+        print("Result empty!")
